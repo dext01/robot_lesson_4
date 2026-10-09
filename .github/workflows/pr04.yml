@@ -16,6 +16,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install linter packages
+        shell: bash
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq ros-jazzy-ament-mypy > /dev/null
+
       - name: Syntax check patrol.py
         shell: bash
         run: |
