@@ -96,6 +96,8 @@ class PatrolNode(Node):
     ) -> SetParametersResult:
         # Сначала проверяем все значения, и только потом меняем состояние.
         for param in params:
+            if param.name == 'publish_hz':
+                continue  # ДЕФЕКТ ПР04: проверка частоты временно отключена
             reason = validate_param(param.name, param.value)
             if reason is not None:
                 self.get_logger().warning(f'rejected: {reason}')
