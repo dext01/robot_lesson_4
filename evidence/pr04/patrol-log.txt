@@ -1,0 +1,6 @@
+[INFO] [1791534499.736939716] [patrol]: patrol started: linear_speed=0.5 turn_rate=0.3 publish_hz=10.0
+[INFO] [1791534511.930770781] [patrol]: publish_hz -> 5.0 (period 0.200 s)
+[WARN] [1791534521.609546214] [patrol]: rejected: publish_hz must be in [1.0, 30.0], got 0.0
+[WARN] [1791534531.291896509] [patrol]: rejected: publish_hz must be in [1.0, 30.0], got -5.0
+[WARN] [1791534532.168166772] [patrol]: rejected: publish_hz must be finite, got nan
+[WARN] [1791534562.419528319] [patrol]: rejected: publish_hz must be in [1.0, 30.0], got 0.0

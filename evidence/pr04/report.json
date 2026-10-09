@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "practice_id": "PR04",
+  "commit": "e4ad3350e352ec95831d226648f27286d7f2cd0e",
+  "commands": [
+    "source /opt/ros/lyrical/setup.bash",
+    "colcon build --symlink-install --packages-select turtle_bringup patrol",
+    "source install/setup.bash",
+    "python3 -m pytest src/patrol/test",
+    "ros2 launch turtle_bringup sim.launch.py",
+    "ros2 run patrol patrol --ros-args -r cmd_vel:=/turtle1/cmd_vel",
+    "ros2 topic hz /turtle1/cmd_vel",
+    "ros2 param set /patrol publish_hz 5.0",
+    "ros2 param set /patrol publish_hz 0.0",
+    "ros2 param set /patrol publish_hz -5.0",
+    "ros2 param set /patrol publish_hz .nan",
+    "ros2 param get /patrol publish_hz",
+    "ros2 service call /clear std_srvs/srv/Empty",
+    "ros2 action list -t"
+  ],
+  "tests": [
+    {
+      "name": "pytest src/patrol/test: 25 passed, 1 skipped (validate_param, choose_cmd, live node params, linters)",
+      "status": "passed",
+      "evidence": "tests.txt"
+    },
+    {
+      "name": "linear_speed 0.8 / turn_rate -0.5 меняют Twist; linear_speed 1.5 отклонён",
+      "status": "passed",
+      "evidence": "speed-params.txt"
+    },
+    {
+      "name": "publish_hz 10 -> 5: таймер пересоздан, hz 10.002 -> 5.000",
+      "status": "passed",
+      "evidence": "hz-10.txt, param-set-5.txt, hz-5.txt"
+    },
+    {
+      "name": "publish_hz 0 / -5 / NaN отклонены, значение 5.0 и поток 5.001 Hz сохранены",
+      "status": "passed",
+      "evidence": "param-set-0.txt, param-set-negative.txt, param-set-nan.txt, hz-after-0.txt, nodes-after.txt"
+    },
+    {
+      "name": "/clear вызван, /turtle1/rotate_absolute найден через ros2 action list -t",
+      "status": "passed",
+      "evidence": "clear.txt, action-list.txt"
+    }
+  ],
+  "defect": {
+    "reproducer": "Ветка defect/pr04-no-hz-check (7d1a798): проверка publish_hz пропущена. ros2 param set /patrol publish_hz 0.0 на работающей ноде.",
+    "root_cause": "Без проверки значение 0 доходит до _restart_timer: старый таймер уже отменён и уничтожен, затем 1.0 / 0.0 бросает ZeroDivisionError внутри сервиса параметров. Исключение выходит из spin, процесс patrol падает, ответ на запрос не отправляется (ros2 param set висит до timeout, код 124), /patrol исчезает из графа, поток команд прекращается.",
+    "proof_after": "На main проверка validate_param выполняется до изменения состояния. ros2 param set publish_hz 0.0 возвращает 'Setting parameter failed: publish_hz must be in [1.0, 30.0], got 0.0', param get показывает прежние 5.0, topic hz — 5.001 Hz, /patrol жив. Тест test_bad_publish_hz_rejected_and_state_kept[0.0/-5.0/nan] падает на ветке дефекта и проходит на main."
+  },
+  "claims": {
+    "public_tests_passed": true,
+    "defect_reproduced": true,
+    "defect_fixed": true
+  },
+  "ai_used": true,
+  "recorded_at_utc": "2026-10-09T08:40:00Z"
+}

@@ -1,0 +1,2 @@
+!rclpy.ok()
+exit code: 124 (124 = timeout, ответа нет)

@@ -1,0 +1,26 @@
+$ ros2 topic echo /turtle1/cmd_vel --once
+linear:
+  x: 0.5
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 0.3
+---
+$ ros2 param set /patrol linear_speed 0.8
+Set parameter successful
+$ ros2 param set /patrol turn_rate -0.5
+Set parameter successful
+$ ros2 topic echo /turtle1/cmd_vel --once
+linear:
+  x: 0.8
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: -0.5
+---
+$ ros2 param set /patrol linear_speed 1.5
+Setting parameter failed: linear_speed must be in [0.0, 1.0], got 1.5

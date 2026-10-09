@@ -1,0 +1,192 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.4, pytest-9.0.2, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /work/src/patrol
+plugins: launch_testing-3.9.7, ament_pep257-0.20.6, ament_copyright-0.20.6, ament_flake8-0.20.6, ament_lint-0.20.6, launch_testing_ros-0.29.8, ament_xmllint-0.20.6, ament_mypy-0.20.6, typeguard-4.4.4, colcon-core-0.21.0
+collecting ... collected 6 items
+
+src/patrol/test/test_params_node.py::test_defaults PASSED                [ 16%]
+src/patrol/test/test_params_node.py::test_publish_hz_10_to_5_recreates_timer PASSED [ 33%]
+src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[0.0] FAILED [ 50%]
+src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[-5.0] FAILED [ 66%]
+src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[nan] FAILED [ 83%]
+src/patrol/test/test_params_node.py::test_speed_change_applies PASSED    [100%]
+
+=================================== FAILURES ===================================
+_______________ test_bad_publish_hz_rejected_and_state_kept[0.0] _______________
+
+node = <patrol.patrol.PatrolNode object at 0x7d72f30c0b90>, bad = 0.0
+
+    @pytest.mark.parametrize('bad', [0.0, -5.0, math.nan])
+    def test_bad_publish_hz_rejected_and_state_kept(
+        node: PatrolNode, bad: float
+    ) -> None:
+        old_timer = node._timer
+>       result = node.set_parameters([Parameter('publish_hz', value=bad)])[0]
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/patrol/test/test_params_node.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:773: in set_parameters
+    result = self._set_parameters_atomically([param])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:840: in _set_parameters_atomically
+    return self._set_parameters_atomically_common(parameter_list)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:890: in _set_parameters_atomically_common
+    result = callback(parameter_list)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+build/patrol/patrol/patrol.py:112: in _on_set_parameters
+    self._restart_timer(float(param.value))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <patrol.patrol.PatrolNode object at 0x7d72f30c0b90>, publish_hz = 0.0
+
+    def _restart_timer(self, publish_hz: float) -> None:
+        old_timer = self._timer
+        old_timer.cancel()
+        self.destroy_timer(old_timer)
+>       self._timer = self.create_timer(1.0 / publish_hz, self._on_timer)
+                                        ^^^^^^^^^^^^^^^^
+E       ZeroDivisionError: division by zero
+
+build/patrol/patrol/patrol.py:119: ZeroDivisionError
+---------------------------- Captured stderr setup -----------------------------
+[INFO] [1791534909.854662120] [patrol]: patrol started: linear_speed=0.5 turn_rate=0.3 publish_hz=10.0
+______________ test_bad_publish_hz_rejected_and_state_kept[-5.0] _______________
+
+node = <patrol.patrol.PatrolNode object at 0x7d72f4fabc50>, bad = -5.0
+
+    @pytest.mark.parametrize('bad', [0.0, -5.0, math.nan])
+    def test_bad_publish_hz_rejected_and_state_kept(
+        node: PatrolNode, bad: float
+    ) -> None:
+        old_timer = node._timer
+>       result = node.set_parameters([Parameter('publish_hz', value=bad)])[0]
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/patrol/test/test_params_node.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:773: in set_parameters
+    result = self._set_parameters_atomically([param])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:840: in _set_parameters_atomically
+    return self._set_parameters_atomically_common(parameter_list)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:890: in _set_parameters_atomically_common
+    result = callback(parameter_list)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+build/patrol/patrol/patrol.py:112: in _on_set_parameters
+    self._restart_timer(float(param.value))
+build/patrol/patrol/patrol.py:119: in _restart_timer
+    self._timer = self.create_timer(1.0 / publish_hz, self._on_timer)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:2521: in create_timer
+    timer = Timer(
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/timer.py:207: in __init__
+    super().__init__(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <rclpy.timer.Timer object at 0x7d72f4eadeb0>
+callback = <bound method PatrolNode._on_timer of <patrol.patrol.PatrolNode object at 0x7d72f4fabc50>>
+timer_period_ns = -200000000, clock = Clock(clock_type=ROS_TIME)
+
+    def __init__(
+        self,
+        callback: Optional[TimerCallbackUnion],
+        timer_period_ns: int,
+        clock: Clock,
+        *,
+        on_destroy: Optional[Callable[['BaseTimer'], None]] = None,
+        context: Optional[Context] = None,
+        autostart: bool = True
+    ) -> None:
+        """
+        Create a timer.
+    
+        .. warning:: Users should not create a timer with this constructor, instead they
+           should call :meth:`.Node.create_timer` or :meth:`.AsyncNode.create_timer`.
+        """
+        self._context = get_default_context() if context is None else context
+        self._clock = clock
+        if self._context.handle is None:
+            raise RuntimeError('Context must be initialized before create a _rclpy.Timer.')
+        with self._clock.handle, self._context.handle:
+>           self.__timer = _rclpy.Timer(
+                self._clock.handle, self._context.handle, timer_period_ns, autostart)
+E           rclpy._rclpy_pybind11.RCLError: failed to create timer: timer period must be non-negative, at ./src/rcl/timer.c:117
+
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/timer.py:99: RCLError
+---------------------------- Captured stderr setup -----------------------------
+[INFO] [1791534909.899926720] [patrol]: patrol started: linear_speed=0.5 turn_rate=0.3 publish_hz=10.0
+_______________ test_bad_publish_hz_rejected_and_state_kept[nan] _______________
+
+node = <patrol.patrol.PatrolNode object at 0x7d72f30c2850>, bad = nan
+
+    @pytest.mark.parametrize('bad', [0.0, -5.0, math.nan])
+    def test_bad_publish_hz_rejected_and_state_kept(
+        node: PatrolNode, bad: float
+    ) -> None:
+        old_timer = node._timer
+>       result = node.set_parameters([Parameter('publish_hz', value=bad)])[0]
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/patrol/test/test_params_node.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:773: in set_parameters
+    result = self._set_parameters_atomically([param])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:840: in _set_parameters_atomically
+    return self._set_parameters_atomically_common(parameter_list)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:890: in _set_parameters_atomically_common
+    result = callback(parameter_list)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+build/patrol/patrol/patrol.py:112: in _on_set_parameters
+    self._restart_timer(float(param.value))
+build/patrol/patrol/patrol.py:119: in _restart_timer
+    self._timer = self.create_timer(1.0 / publish_hz, self._on_timer)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <patrol.patrol.PatrolNode object at 0x7d72f30c2850>
+timer_period_sec = nan
+callback = <bound method PatrolNode._on_timer of <patrol.patrol.PatrolNode object at 0x7d72f30c2850>>
+callback_group = None, clock = None, autostart = True
+
+    def create_timer(
+        self,
+        timer_period_sec: float,
+        callback: Optional[TimerCallbackUnion],
+        callback_group: Optional[CallbackGroup] = None,
+        clock: Optional[Clock] = None,
+        autostart: bool = True,
+    ) -> Timer:
+        """
+        Create a new timer.
+    
+        If autostart is ``True`` (the default), the timer will be started and every
+        ``timer_period_sec`` number of seconds the provided callback function will be called.
+        If autostart is ``False``, the timer will be created but not started; it can then be
+        started by calling ``reset()`` on the timer object.
+    
+        :param timer_period_sec: The period (in seconds) of the timer.
+        :param callback: A user-defined callback function that is called when the timer expires.
+        :param callback_group: The callback group for the timer. If ``None``, then the
+            default callback group for the node is used.
+        :param clock: The clock which the timer gets time from.
+        :param autostart: Whether to automatically start the timer after creation; defaults to
+            ``True``.
+        """
+>       timer_period_nsec = int(float(timer_period_sec) * S_TO_NS)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: cannot convert float NaN to integer
+
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/node.py:2516: ValueError
+---------------------------- Captured stderr setup -----------------------------
+[INFO] [1791534909.955430494] [patrol]: patrol started: linear_speed=0.5 turn_rate=0.3 publish_hz=10.0
+=========================== short test summary info ============================
+FAILED src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[0.0]
+FAILED src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[-5.0]
+FAILED src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[nan]
+========================= 3 failed, 3 passed in 0.38s ==========================

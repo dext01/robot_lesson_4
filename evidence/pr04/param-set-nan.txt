@@ -1,0 +1,2 @@
+Setting parameter failed: publish_hz must be finite, got nan
+Double value is: 5.0

@@ -1,0 +1,2 @@
+Set parameter successful
+Double value is: 5.0

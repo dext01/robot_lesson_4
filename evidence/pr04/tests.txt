@@ -1,0 +1,35 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.4, pytest-9.0.2, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /work/src/patrol
+plugins: launch_testing-3.9.7, ament_pep257-0.20.6, ament_copyright-0.20.6, ament_flake8-0.20.6, ament_lint-0.20.6, launch_testing_ros-0.29.8, ament_xmllint-0.20.6, ament_mypy-0.20.6, typeguard-4.4.4, colcon-core-0.21.0
+collecting ... collected 26 items
+
+src/patrol/test/test_choose_cmd.py::test_no_pose_returns_zero_twist PASSED [  3%]
+src/patrol/test/test_choose_cmd.py::test_pose_uses_parameter_values PASSED [  7%]
+src/patrol/test/test_choose_cmd.py::test_publish_hz_10_to_5_is_valid PASSED [ 11%]
+src/patrol/test/test_choose_cmd.py::test_publish_hz_rejected[0.0] PASSED [ 15%]
+src/patrol/test/test_choose_cmd.py::test_publish_hz_rejected[-5.0] PASSED [ 19%]
+src/patrol/test/test_choose_cmd.py::test_publish_hz_rejected[nan] PASSED [ 23%]
+src/patrol/test/test_choose_cmd.py::test_publish_hz_rejected[inf] PASSED [ 26%]
+src/patrol/test/test_choose_cmd.py::test_publish_hz_rejected[31.0] PASSED [ 30%]
+src/patrol/test/test_choose_cmd.py::test_speed_limits[linear_speed--0.1] PASSED [ 34%]
+src/patrol/test/test_choose_cmd.py::test_speed_limits[linear_speed-1.5] PASSED [ 38%]
+src/patrol/test/test_choose_cmd.py::test_speed_limits[linear_speed-nan] PASSED [ 42%]
+src/patrol/test/test_choose_cmd.py::test_speed_limits[turn_rate-1.1] PASSED [ 46%]
+src/patrol/test/test_choose_cmd.py::test_speed_limits[turn_rate--1.1] PASSED [ 50%]
+src/patrol/test/test_choose_cmd.py::test_speed_limits[turn_rate-inf] PASSED [ 53%]
+src/patrol/test/test_choose_cmd.py::test_speed_bounds_inclusive PASSED   [ 57%]
+src/patrol/test/test_copyright.py::test_copyright SKIPPED (No copyri...) [ 61%]
+src/patrol/test/test_flake8.py::test_flake8 PASSED                       [ 65%]
+src/patrol/test/test_mypy.py::test_mypy PASSED                           [ 69%]
+src/patrol/test/test_params_node.py::test_defaults PASSED                [ 73%]
+src/patrol/test/test_params_node.py::test_publish_hz_10_to_5_recreates_timer PASSED [ 76%]
+src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[0.0] PASSED [ 80%]
+src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[-5.0] PASSED [ 84%]
+src/patrol/test/test_params_node.py::test_bad_publish_hz_rejected_and_state_kept[nan] PASSED [ 88%]
+src/patrol/test/test_params_node.py::test_speed_change_applies PASSED    [ 92%]
+src/patrol/test/test_pep257.py::test_pep257 PASSED                       [ 96%]
+src/patrol/test/test_xmllint.py::test_xmllint PASSED                     [100%]
+
+======================== 25 passed, 1 skipped in 4.70s =========================

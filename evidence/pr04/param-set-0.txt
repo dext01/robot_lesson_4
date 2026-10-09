@@ -1,0 +1,2 @@
+Setting parameter failed: publish_hz must be in [1.0, 30.0], got 0.0
+Double value is: 5.0
