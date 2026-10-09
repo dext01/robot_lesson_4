@@ -1,0 +1,68 @@
+name: PR04 patrol params
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    container:
+      image: osrf/ros:jazzy-desktop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Syntax check patrol.py
+        shell: bash
+        run: |
+          python3 -m py_compile src/patrol/patrol/patrol.py
+          python3 -m py_compile src/turtle_bringup/launch/sim.launch.py
+
+      - name: Adapt turtlesim Pose import for Jazzy
+        shell: bash
+        run: |
+          # Jazzy: тип Pose — turtlesim/msg/Pose (Lyrical: turtlesim_msgs/msg/Pose)
+          # На CI подменяем только для сборки/тестов, локально работает вариант Lyrical.
+          sed -i 's|from turtlesim_msgs.msg import Pose|from turtlesim.msg import Pose|' \
+            src/patrol/patrol/patrol.py src/patrol/test/test_choose_cmd.py src/patrol/test/test_params_node.py
+          sed -i 's|<depend>turtlesim_msgs</depend>|<depend>turtlesim</depend>|' \
+            src/patrol/package.xml
+
+      - name: Build packages
+        shell: bash
+        run: |
+          set -o pipefail
+          source /opt/ros/jazzy/setup.bash
+          colcon build --symlink-install --packages-select turtle_bringup patrol
+
+      - name: Verify installed launch file
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source install/setup.bash
+          LAUNCH="$(ros2 pkg prefix turtle_bringup)/share/turtle_bringup/launch/sim.launch.py"
+          test -f "$LAUNCH" || { echo "sim.launch.py not installed at $LAUNCH"; exit 1; }
+          python3 -m py_compile "$LAUNCH"
+
+      - name: Verify patrol executable
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source install/setup.bash
+          ros2 pkg executables patrol | grep -q '^patrol patrol$'
+
+      - name: Run patrol tests
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source install/setup.bash
+          python3 -m pytest src/patrol/test -v
+
+      - name: Validate report.json
+        shell: bash
+        run: |
+          python3 -m json.tool evidence/pr04/report.json > /dev/null
